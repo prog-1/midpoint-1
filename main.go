@@ -52,7 +52,7 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		if f > 0 {
 			if y1 < y2 {
 				y += 1
-			} else {
+			} else if y1 > y2 {
 				y -= 1
 			}
 		}
@@ -65,6 +65,7 @@ func (l *Line) Draw(screen *ebiten.Image) {
 	DrawLine(screen, 300, 100, 100, 420, l.color) // additional
 	DrawLine(screen, 500, 100, 500, 450, l.color) // additional  ?
 	DrawLine(screen, 50, 450, 500, 450, l.color)  // additional  ?
+	DrawLine(screen, 80, 300, 110, 50, l.color)   // additional  ?
 }
 
 // Game is a game instance.
