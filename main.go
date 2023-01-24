@@ -45,16 +45,27 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 	A := (float64(y2 - y1))
 	B := -(float64(x2 - x1))
 	C := -B*float64(y1) - A*float64(x1)
-	dy := 1
-	if y1 > y2 {
-		dy = -1
-	}
-	for x != x2 && y != y2 {
-		img.Set(x, y, c)
-		f := A*float64(x+1) + B*(float64(y)+0.5) + C
-		x += 1
-		if f > 0 {
-			y += dy
+	if A <= -B {
+		dy := 1
+		if y1 > y2 {
+			dy = -1
+		}
+		for x <= x2 {
+			img.Set(x, y, c)
+			f := A*float64(x+1) + B*(float64(y)+0.5) + C
+			x += 1
+			if f > 0 {
+				y += dy
+			}
+		}
+	} else { // A > -B
+		for y <= y2 {
+			img.Set(x, y, c)
+			f := A*(float64(x)+0.5) + B*float64(y+1) + C
+			y += 1
+			if f > 0 {
+				x += 1
+			}
 		}
 	}
 }
