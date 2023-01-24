@@ -3,7 +3,6 @@ package main
 import (
 	"image/color"
 	"log"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -42,21 +41,21 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		x1, x2 = x2, x1
 		y1, y2 = y2, y1
 	}
-	x, y := float64(x1), float64(y1)
-	A := math.Abs(float64(y2 - y1))
-	B := -math.Abs(float64(x2 - x1))
+	x, y := x1, y1
+	A := (float64(y2 - y1))
+	B := -(float64(x2 - x1))
 	C := -B*float64(y1) - A*float64(x1)
-	for x != float64(x2) && y != float64(y2) {
-		f := A*(x+1) + B*(y+float64(1)/float64(2)) + C
+	dy := 1
+	if y1 > y2 {
+		dy = -1
+	}
+	for x != x2 && y != y2 {
+		img.Set(x, y, c)
+		f := A*float64(x+1) + B*(float64(y)+0.5) + C
 		x += 1
 		if f > 0 {
-			if y1 < y2 {
-				y += 1
-			} else if y1 > y2 {
-				y -= 1
-			}
+			y += dy
 		}
-		img.Set(int(x), int(y), c)
 	}
 }
 
