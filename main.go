@@ -29,20 +29,28 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 	if math.Abs(float64(Δy)/float64(Δx)) <= 1 {
 		A, B, C := Δy, -Δx, Δx*y1-Δy*x1
 		y := y1
+		dirY := 1.0
+		if Δy < 0 {
+			dirY = -1
+		}
 		for x := x1; x < x2; x++ {
 			s := A*(x+1) + B*(y+0.5) + C
-			if s > 0 {
-				y += 1
+			if s*dirY > 0 {
+				y += dirY
 			}
 			screen.Set(int(x), int(y), c)
 		}
 	} else {
 		A, B, C := Δx, -Δy, Δy*x1-Δx*y1
 		x := x1
+		dirX := 1.0
+		if Δx < 0 {
+			dirX = -1
+		}
 		for y := y1; y < y2; y++ {
 			s := A*(y+1) + B*(x+0.5) + C
-			if s > 0 {
-				x += 1
+			if s*dirX > 0 {
+				x += dirX
 			}
 			screen.Set(int(x), int(y), c)
 		}
