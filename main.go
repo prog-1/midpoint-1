@@ -33,14 +33,19 @@ type game struct {
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
 func (g *game) Update() error {
 	g.l.Degrees += 1
+	if math.Abs(g.l.Degrees) > 45 {
+		g.l.Degrees = 0
+	}
 	return nil
 }
 func (g *game) Draw(screen *ebiten.Image) {
-	x := float64(g.l.Magnitude) * math.Cos(ToRadians(g.l.Degrees))
-	y := float64(g.l.Magnitude) * math.Sin(ToRadians(g.l.Degrees))
-	x2, y2 := x+float64(g.l.X1), y+float64(g.l.Y1)
+	// x := float64(g.l.Magnitude) * math.Cos(ToRadians(g.l.Degrees))
+	// y := float64(g.l.Magnitude) * math.Sin(ToRadians(g.l.Degrees))
+	// x2, y2 := x+float64(g.l.X1), y+float64(g.l.Y1)
 
-	DrawLineDDA(screen, g.l.X1, g.l.Y1, int(x2), int(y2), g.l.Color)
+	//DrawLine(screen, g.l.X1, g.l.Y1, int(x2), int(y2), g.l.Color)
+	DrawLine(screen, g.l.X1, g.l.Y1, 500, 220, g.l.Color)
+	ebitenutil.DebugPrint(screen, fmt.Sprint(d))
 }
 
 func main() {
@@ -51,32 +56,30 @@ func main() {
 	}
 }
 
-// DrawLineDDA rasterizes a line using Digital Differential Analyzer algorithm.
-func DrawLineDDA(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
+var d float64
+
+func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 	if x2 < x1 {
 		x1, x2 = x2, x1
 		y1, y2 = y2, y1
 	}
 	Dx := x2 - x1
 	Dy := y2 - y1
-	A := float64(Dy)
-	B := float64(-Dx)
-	// C = b = y - kx = y1 - kx1
-	k := Dy / Dx
-	C := float64(y1 - k + x1)
+	k := float64(Dy) / float64(Dx)
+	b := float64(y1) - k*float64(x1)
 
-	// xm, ym - middle pointn coord.
-	xmp, ymp := float64(x1+1), float64(y1)+0.5
-	d1 := A*xm + B*ym + C
-	ebitenutil.DebugPrint(img, fmt.Sprint(d1))
-	for x := x1; x < x2; x++ {
-		var xm2, ym2 float64
-		if d1 >= 0 { // E
-			xm2, ym2 = x1+2, float64(y1)+0.5
+	f := func(x, y float64) float64 {
+		return k*x + b
+	}
 
-		} else { // NE
+	img.Set(x2, y2, c)
 
+	for x, y := x1, y1; x < x2; x++ {
+		img.Set(x, y, c)
+		xm, ym := float64(x+1), float64(y)+0.5
+		d = f(xm, ym)
+		if d < 0 {
+			y--
 		}
-		img.Set(x1+1, y1+1, c)
 	}
 }
