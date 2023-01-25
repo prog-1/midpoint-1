@@ -66,13 +66,17 @@ func DrawLineDDA(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 	C := float64(y1 - k + x1)
 
 	// xm, ym - middle pointn coord.
-	xm, ym := float64(x1+1), float64(y1)+0.5
+	xmp, ymp := float64(x1+1), float64(y1)+0.5
 	d1 := A*xm + B*ym + C
 	ebitenutil.DebugPrint(img, fmt.Sprint(d1))
-	if d1 >= 0 {
-		img.Set(x1+1, y1+1, c)
-	}
 	for x := x1; x < x2; x++ {
+		var xm2, ym2 float64
+		if d1 >= 0 { // E
+			xm2, ym2 = x1+2, float64(y1)+0.5
 
+		} else { // NE
+
+		}
+		img.Set(x1+1, y1+1, c)
 	}
 }
