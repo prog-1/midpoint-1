@@ -27,15 +27,25 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 	}
 	Δx, Δy := x2-x1, y2-y1
 	A, B, C := Δy, -Δx, Δx*y1-Δy*x1
-	y := y1
-	for x := x1; x < x2; x++ {
-		s := A*x + B*y + C
-		if s > 0 {
-			y += 1
+	if math.Abs(float64(Δy)/float64(Δx)) <= 1 {
+		y := y1
+		for x := x1; x < x2; x++ {
+			s := A*x + B*(y+0.5) + C
+			if s > 0 {
+				y += 1
+			}
+			screen.Set(int(x), int(y), c)
 		}
-		screen.Set(int(x), int(y), c)
+	} else {
+		x := x1
+		for y := y1; y < y2; y++ {
+			s := A*y + B*(x+0.5) + C
+			if s > 0 {
+				x += 1
+			}
+			screen.Set(int(x), int(y), c)
+		}
 	}
-	// Δy := 1
 }
 
 func ToRadians(Degrees float64) float64 {
