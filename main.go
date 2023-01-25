@@ -44,7 +44,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 	// x2, y2 := x+float64(g.l.X1), y+float64(g.l.Y1)
 
 	//DrawLine(screen, g.l.X1, g.l.Y1, int(x2), int(y2), g.l.Color)
-	DrawLine(screen, g.l.X1, g.l.Y1, 500, 220, g.l.Color)
+	DrawLine(screen, g.l.X1, g.l.Y1, 10, 20, g.l.Color)
 	ebitenutil.DebugPrint(screen, fmt.Sprint(d))
 }
 
@@ -63,21 +63,19 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		x1, x2 = x2, x1
 		y1, y2 = y2, y1
 	}
-	Dx := x2 - x1
-	Dy := y2 - y1
-	k := float64(Dy) / float64(Dx)
-	b := float64(y1) - k*float64(x1)
+	Dx, Dy := x2-x1, y2-y1
+	A, B, C := Dy, -Dx, Dx*y1-Dy*x1
 
 	f := func(x, y float64) float64 {
-		return k*x + b
+		return float64(A)*x + float64(B)*y + float64(C)
 	}
 
 	img.Set(x2, y2, c)
 
 	for x, y := x1, y1; x < x2; x++ {
 		img.Set(x, y, c)
-		xm, ym := float64(x+1), float64(y)+0.5
-		d = f(xm, ym)
+		xm, ym := x+1, float64(y)-0.5
+		d = f(float64(xm), ym)
 		if d < 0 {
 			y--
 		}
