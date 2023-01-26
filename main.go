@@ -35,7 +35,7 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 		}
 		for x := x1; x < x2; x++ {
 			screen.Set(int(x), int(y), c)
-			s := A*(x+1) + B*(y+0.5) + C
+			s := A*(x+1) + B*(y+0.5*dirY) + C
 			if s*dirY > 0 {
 				y += dirY
 			}
@@ -55,8 +55,8 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 		}
 		for y := y1; y < y2; y++ {
 			screen.Set(int(x), int(y), c)
-			s := A*(y+1) + B*(x+0.5) + C
-			if s*dirX > 0 {
+			s := A*(y+1) + B*(x+0.5*dirX) + C
+			if dirX*s > 0 {
 				x += dirX
 			}
 		}
