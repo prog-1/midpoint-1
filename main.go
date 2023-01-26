@@ -21,12 +21,12 @@ type Line struct {
 }
 
 func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
-	if x2 < x1 {
-		x1, x2 = x2, x1
-		y1, y2 = y2, y1
-	}
-	Δx, Δy := x2-x1, y2-y1
-	if math.Abs(float64(Δy)/float64(Δx)) <= 1 {
+	if math.Abs(float64(y2-y1)/float64(x2-x1)) <= 1 {
+		if x2 < x1 {
+			x1, x2 = x2, x1
+			y1, y2 = y2, y1
+		}
+		Δx, Δy := x2-x1, y2-y1
 		A, B, C := Δy, -Δx, Δx*y1-Δy*x1
 		y := y1
 		dirY := 1.0
@@ -34,13 +34,19 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 			dirY = -1
 		}
 		for x := x1; x < x2; x++ {
+			screen.Set(int(x), int(y), c)
 			s := A*(x+1) + B*(y+0.5) + C
 			if s*dirY > 0 {
 				y += dirY
 			}
-			screen.Set(int(x), int(y), c)
 		}
 	} else {
+		if y2 < y1 {
+			x1, x2 = x2, x1
+			y1, y2 = y2, y1
+		}
+		Δx, Δy := x2-x1, y2-y1
+
 		A, B, C := Δx, -Δy, Δy*x1-Δx*y1
 		x := x1
 		dirX := 1.0
@@ -48,11 +54,11 @@ func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 			dirX = -1
 		}
 		for y := y1; y < y2; y++ {
+			screen.Set(int(x), int(y), c)
 			s := A*(y+1) + B*(x+0.5) + C
 			if s*dirX > 0 {
 				x += dirX
 			}
-			screen.Set(int(x), int(y), c)
 		}
 	}
 }
