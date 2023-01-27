@@ -15,18 +15,37 @@ const (
 	screenHeight = 480
 )
 
-type game struct{}
+type Line struct {
+	x1, y1  int
+	length  int
+	radians float64
+	c       color.Color
+}
+
+type game struct {
+	l *Line
+}
 
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
-func (g *game) Update() error                             { return nil }
+func (g *game) Update() error {
+	g.l.radians += math.Pi / 180
+	if g.l.radians > math.Pi/2 {
+		g.l.radians = 0
+	}
+	return nil
+}
 func (g *game) Draw(screen *ebiten.Image) {
-	DrawLine(screen, 320, 240, 400, 100, color.White)
+	x := float64(g.l.length) * math.Cos(g.l.radians)
+	y := float64(g.l.length) * math.Sin(g.l.radians)
+	x2, y2 := g.l.x1+int(x), g.l.y1+int(y)
+	DrawLine(screen, g.l.x1, g.l.y1, x2, y2, g.l.c)
 	ebitenutil.DebugPrint(screen, fmt.Sprint(d))
 }
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
-	if err := ebiten.RunGame(&game{}); err != nil {
+	g := game{&Line{screenWidth / 2, screenHeight / 2, 100, 0, color.RGBA{1, 100, 100, 255}}}
+	if err := ebiten.RunGame(&g); err != nil {
 		log.Fatal(err)
 	}
 }
