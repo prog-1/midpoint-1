@@ -34,7 +34,7 @@ func (g *Game) Update() error {
 	//all logic on update
 
 	//increasing rotation
-	g.l.radians += math.Pi / 180
+	g.l.radians += math.Pi / 90 // /180
 
 	return nil
 }
@@ -52,38 +52,48 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.l.y2 = g.l.y1 + y
 
 	//Line Draw
-	g.DrawLine(screen, g.l.x1, g.l.y1, g.l.x2, g.l.y2, color.RGBA{255, 255, 255, 255}) //x2 = screenWidth/2+100 | y2 = screenHeight/2-100
+	g.DrawLine(screen, fl(g.l.x1), fl(g.l.y1), fl(g.l.x2), fl(g.l.y2), color.RGBA{255, 255, 255, 255}) //x2 = screenWidth/2+100 | y2 = screenHeight/2-100
 }
 
 //-------------------------Functions----------------------------------
 
-func (g *Game) DrawLine(screen *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
+func fl(v int) float64 { return float64(v) } //to make convertion shorter
+
+func (g *Game) DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
+
+	
+	if x2 < x1 {
+		x1, x2 = x2, x1
+		y1, y2 = y2, y1
+	}
 
 	//For debug
-	screen.Set(x1, y1, c) //starting point
-	screen.Set(x2, y2, c) //ending point
+	screen.Set(int(x1), int(y1), c) //starting point
+	screen.Set(int(x2), int(y2), c) //ending point
 
-	s := 1 //sign of y (+ or -)
+	//Sign of y (+ or -)
+	var s float64
+	s = 1
 	if y2 < y1 {
 		s = -1
 	}
 
+	//Formula's variables
 	A := y2 - y1      //Δy
 	B := x1 - x2      // -Δx
 	C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
 
-	fl := func(v int) float64 { return float64(v) } //to make formula shorter
-
 	for x, y := x1, y1; x < x2; x++ {
 
-		f := fl(A)*fl(x) + fl(B)*(fl(y)+(0.5*fl(s))) + fl(C) //Ax + By + C
+		screen.Set(int(x), int(y), c) //filling the pixel
+
+		f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
 		//B*y-0.5 to up, B*y+0.5 to down
 
 		//if f < 0 fill the pixel on (x+1; y)
-		if f >= 0 { //fill the pixel on (x+1; y+1)
+		if f*s >= 0 { //fill the pixel on (x+1; y+1)
 			y = y + s //y-- to up, y++ to down
 		}
-		screen.Set(x, y, c) //filling the pixel
 
 	}
 }
@@ -101,7 +111,7 @@ func main() {
 
 	//creating game instance
 	g := &Game{width: screenWidth, height: screenHeight,
-		l: &line{x1: screenWidth / 2, y1: screenHeight / 2, x2: 100, y2: 0, magnitude: 100, radians: 0}} //configuring line
+		l: &line{x1: screenWidth / 2, y1: screenHeight / 2, x2: 100, y2: 0, magnitude: 150, radians: 0}} //configuring line
 
 	//running game
 	if err := ebiten.RunGame(g); err != nil {
