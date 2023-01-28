@@ -61,41 +61,82 @@ func fl(v int) float64 { return float64(v) } //to make convertion shorter
 
 func (g *Game) DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 
-	
-	if x2 < x1 {
-		x1, x2 = x2, x1
-		y1, y2 = y2, y1
-	}
+	if math.Abs(y2-y1) < math.Abs(x2-x1) {
 
-	//For debug
-	screen.Set(int(x1), int(y1), c) //starting point
-	screen.Set(int(x2), int(y2), c) //ending point
-
-	//Sign of y (+ or -)
-	var s float64
-	s = 1
-	if y2 < y1 {
-		s = -1
-	}
-
-	//Formula's variables
-	A := y2 - y1      //Δy
-	B := x1 - x2      // -Δx
-	C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
-
-	for x, y := x1, y1; x < x2; x++ {
-
-		screen.Set(int(x), int(y), c) //filling the pixel
-
-		f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
-		//B*y-0.5 to up, B*y+0.5 to down
-
-		//if f < 0 fill the pixel on (x+1; y)
-		if f*s >= 0 { //fill the pixel on (x+1; y+1)
-			y = y + s //y-- to up, y++ to down
+		//drawing line from end to start if line is going left
+		if x2 < x1 {
+			x1, x2 = x2, x1
+			y1, y2 = y2, y1
 		}
 
+		//For debug
+		screen.Set(int(x1), int(y1), c) //starting point
+		screen.Set(int(x2), int(y2), c) //ending point
+
+		//Sign of y (+ or -)
+		var s float64
+		s = 1
+		if y2 < y1 {
+			s = -1
+		}
+
+		//Formula's variables
+		A := y2 - y1      //Δy
+		B := x1 - x2      // -Δx
+		C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
+
+		for x, y := x1, y1; x < x2; x++ {
+
+			screen.Set(int(x), int(y), c) //filling the pixel
+
+			f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
+			//B*y-0.5 to up, B*y+0.5 to down
+
+			//if f < 0 fill the pixel on (x+1; y)
+			if f*s >= 0 { //fill the pixel on (x+1; y+1)
+				y = y + s //y-- to up, y++ to down
+			}
+
+		}
+	} else { //swapping x and y
+
+		//drawing line from end to start if line is going left
+		if y2 < y1 {
+			x1, x2 = x2, x1
+			y1, y2 = y2, y1
+		}
+
+		//For debug
+		screen.Set(int(x1), int(y1), c) //starting point
+		screen.Set(int(x2), int(y2), c) //ending point
+
+		//Sign of x (+ or -)
+		var s float64
+		s = 1
+		if x2 < x1 {
+			s = -1
+		}
+
+		//Formula's variables
+		A := y2 - y1      //Δy
+		B := x1 - x2      // -Δx
+		C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
+
+		for x, y := x1, y1; y < y2; y++ {
+
+			screen.Set(int(x), int(y), c) //filling the pixel
+
+			f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
+			//B*y-0.5 to up, B*y+0.5 to down
+
+			//if f < 0 fill the pixel on (x+1; y)
+			if f*s <= 0 { //fill the pixel on (x+1; y+1)
+				x = x + s //x-- to up, x++ to down
+			}
+
+		}
 	}
+
 }
 
 //---------------------------Main-------------------------------------
