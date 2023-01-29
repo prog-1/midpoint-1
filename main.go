@@ -19,56 +19,46 @@ type Game struct {
 	width, height int
 }
 
-func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, color color.Color) {
-	if math.Abs(float64(x2-x1)) >= math.Abs(float64(y2-y1)) {
+func DrawLine(img *ebiten.Image, x1, y1, x2, y2 float64, color color.Color) {
+	if math.Abs(x2-x1) >= math.Abs(y2-y1) {
 		if x2 < x1 {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
-		a, b, c := float64(y2-y1), float64(-(x2 - x1)), float64(x2*y1-y2*x1)
-		if y1 > y2 {
-			for x, y := float64(x1), float64(y1); int(x) <= x2; x = x + 1 {
-				if a*(x+1)+b*(y-0.5)+c <= 0 {
-					img.Set(int(x)+1, int(y)-1, color)
-					y--
-				} else {
-					img.Set(int(x)+1, int(y), color)
-				}
+		a, b := y2-y1, x1-x2
+		dirY := 1.0
+		if a < 0 {
+			dirY = -1
+			a = -a
+		}
+		d := a + b/2
+		for x, y := x1, y1; x <= x2; x = x + 1 {
+			img.Set(int(x), int(y), color)
+			if d > 0 {
+				d += b
+				y += dirY
 			}
-		} else {
-			for x, y := float64(x1), float64(y1); int(x) <= x2; x = x + 1 {
-				if a*(x+1)+b*(y+0.5)+c <= 0 {
-					img.Set(int(x)+1, int(y), color)
-				} else {
-					img.Set(int(x)+1, int(y)+1, color)
-					y++
-				}
-			}
+			d += a
 		}
 	} else {
 		if y2 < y1 {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
-		a, b, c := float64(y2-y1), float64(-(x2 - x1)), float64(x2*y1-y2*x1)
-		if x1 > x2 {
-			for x, y := float64(x1), float64(y1); int(y) <= y2; y = y + 1 {
-				if a*(x-0.5)+b*(y+1)+c <= 0 {
-					img.Set(int(x), int(y)+1, color)
-				} else {
-					img.Set(int(x)-1, int(y)+1, color)
-					x--
-				}
+		a, b := x2-x1, y1-y2
+		dirX := 1.0
+		if a < 0 {
+			dirX = -1
+			a = -a
+		}
+		d := a + b/2
+		for x, y := x1, y1; y <= y2; y = y + 1 {
+			img.Set(int(x), int(y), color)
+			if d > 0 {
+				d += b
+				x += dirX
 			}
-		} else {
-			for x, y := float64(x1), float64(y1); int(y) <= y2; y = y + 1 {
-				if a*(x+0.5)+b*(y+1)+c <= 0 {
-					img.Set(int(x)+1, int(y)+1, color)
-					x++
-				} else {
-					img.Set(int(x), int(y)+1, color)
-				}
-			}
+			d += a
 		}
 	}
 }
@@ -89,7 +79,7 @@ func (g *Game) Update(screen *ebiten.Image) error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	DrawLine(screen, g.width/2, g.height/2, 500, 100, color.White)
+	DrawLine(screen, 320, 240, 500, 100, color.White)
 }
 
 func main() {
