@@ -34,7 +34,14 @@ func (g *Game) Update() error {
 	//all logic on update
 
 	//increasing rotation
-	g.l.radians += math.Pi / 90 // /180
+	g.l.radians += math.Pi / 90
+
+	//to restrict the rotation
+	// if g.l.radians > 2*math.Pi {
+	// 	g.l.radians = 3 * math.Pi / 2
+	// } else {
+	// 	g.l.radians += math.Pi / 90
+	// }
 
 	return nil
 }
@@ -70,31 +77,33 @@ func (g *Game) DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Co
 		}
 
 		//For debug
-		screen.Set(int(x1), int(y1), c) //starting point
-		screen.Set(int(x2), int(y2), c) //ending point
+		//screen.Set(int(x1), int(y1), c) //starting point
+		//screen.Set(int(x2), int(y2), c) //ending point
+
+		//Formula's variables
+		A := y2 - y1 //Δy
+		B := x1 - x2 // -Δx
 
 		//Sign of y (+ or -)
 		var s float64
 		s = 1
 		if y2 < y1 {
 			s = -1
+			A = -A
 		}
 
-		//Formula's variables
-		A := y2 - y1      //Δy
-		B := x1 - x2      // -Δx
-		C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
+		d := A + B/2 //d = d0// f from first middle point
 
 		for x, y := x1, y1; x < x2; x++ {
 
 			screen.Set(int(x), int(y), c) //filling the pixel
 
-			f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
-			//B*y-0.5 to up, B*y+0.5 to down
-
-			//if f < 0 fill the pixel on (x+1; y)
-			if f*s >= 0 { //fill the pixel on (x+1; y+1)
-				y = y + s //y-- to up, y++ to down
+			//if f from d< 0 fill the pixel on (x+1; y)
+			if d*s >= 0 { //fill the pixel on (x+1; y+1)
+				y = y + s        //y-- to up, y++ to down
+				d += (A + B) * s //dp+1 = dp+Δd  Δd = A+B
+			} else {
+				d += A * s //dp+1 = dp+Δd  Δd = A
 			}
 
 		}
@@ -107,31 +116,33 @@ func (g *Game) DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Co
 		}
 
 		//For debug
-		screen.Set(int(x1), int(y1), c) //starting point
-		screen.Set(int(x2), int(y2), c) //ending point
+		//screen.Set(int(x1), int(y1), c) //starting point
+		//screen.Set(int(x2), int(y2), c) //ending point
+
+		//Formula's variables
+		A := x2 - x1 //Δy
+		B := y1 - y2 // -Δx
 
 		//Sign of x (+ or -)
 		var s float64
 		s = 1
 		if x2 < x1 {
 			s = -1
+			A = -A
 		}
 
-		//Formula's variables
-		A := y2 - y1      //Δy
-		B := x1 - x2      // -Δx
-		C := -B*y1 - A*x1 // C = Δx * y1 - Δy *x1
+		d := A + B/2 //d = d0// f from first middle point
 
 		for x, y := x1, y1; y < y2; y++ {
 
 			screen.Set(int(x), int(y), c) //filling the pixel
 
-			f := A*x + B*(y+(0.5*s)) + C //Ax + By + C
-			//B*y-0.5 to up, B*y+0.5 to down
-
 			//if f < 0 fill the pixel on (x+1; y)
-			if f*s <= 0 { //fill the pixel on (x+1; y+1)
-				x = x + s //x-- to up, x++ to down
+			if d*s >= 0 { //fill the pixel on (x+1; y+1)
+				x = x + s        //x-- to up, x++ to down
+				d += (A + B) * s //dp+1 = dp+Δd  Δd = A+B
+			} else {
+				d += A * s //dp+1 = dp+Δd  Δd = A
 			}
 
 		}
@@ -152,7 +163,7 @@ func main() {
 
 	//creating game instance
 	g := &Game{width: screenWidth, height: screenHeight,
-		l: &line{x1: screenWidth / 2, y1: screenHeight / 2, x2: 100, y2: 0, magnitude: 150, radians: 0}} //configuring line
+		l: &line{x1: screenWidth / 2, y1: screenHeight / 2, x2: 100, y2: 0, magnitude: 150, radians: 3 * math.Pi / 2 /*0*/}} //configuring line
 
 	//running game
 	if err := ebiten.RunGame(g); err != nil {
