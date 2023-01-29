@@ -21,43 +21,94 @@ type Line struct {
 }
 
 func DrawLine(screen *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
+	// if math.Abs(float64(y2-y1)/float64(x2-x1)) <= 1 {
+	// 	if x2 < x1 {
+	// 		x1, x2 = x2, x1
+	// 		y1, y2 = y2, y1
+	// 	}
+	// 	Δx, Δy := x2-x1, y2-y1
+	// 	A, B, C := Δy, -Δx, Δx*y1-Δy*x1
+	// 	y := y1
+	// 	dirY := 1.0
+	// 	if Δy < 0 {
+	// 		dirY = -1
+	// 	}
+	// 	for x := x1; x < x2; x++ {
+	// 		screen.Set(int(x), int(y), c)
+	// 		s := A*(x+1) + B*(y+0.5*dirY) + C
+	// 		if s*dirY > 0 {
+	// 			y += dirY
+	// 		}
+	// 	}
+	// } else {
+	// 	if y2 < y1 {
+	// 		x1, x2 = x2, x1
+	// 		y1, y2 = y2, y1
+	// 	}
+	// 	Δx, Δy := x2-x1, y2-y1
+
+	// 	A, B, C := Δx, -Δy, Δy*x1-Δx*y1
+	// 	x := x1
+	// 	dirX := 1.0
+	// 	if Δx < 0 {
+	// 		dirX = -1
+	// 	}
+	// 	for y := y1; y < y2; y++ {
+	// 		screen.Set(int(x), int(y), c)
+	// 		s := A*(y+1) + B*(x+0.5*dirX) + C
+	// 		if dirX*s > 0 {
+	// 			x += dirX
+	// 		}
+	// 	}
+	// }
 	if math.Abs(float64(y2-y1)/float64(x2-x1)) <= 1 {
-		if x2 < x1 {
+		if x1 > x2 {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
 		Δx, Δy := x2-x1, y2-y1
 		A, B, C := Δy, -Δx, Δx*y1-Δy*x1
-		y := y1
+		f := func(x, y float64) float64 {
+			return A*x + B*y + C
+		}
+		d := f(x1+1, y1+1/2)
 		dirY := 1.0
+
 		if Δy < 0 {
 			dirY = -1
 		}
-		for x := x1; x < x2; x++ {
+		for x, y := x1, y1; x < x2; x++ {
 			screen.Set(int(x), int(y), c)
-			s := A*(x+1) + B*(y+0.5*dirY) + C
-			if s*dirY > 0 {
+			if d >= 0 { // NE
 				y += dirY
+				d += Δy - Δx
+			} else { // E
+				d += Δy
 			}
 		}
 	} else {
-		if y2 < y1 {
+		if y1 > y2 {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
 		Δx, Δy := x2-x1, y2-y1
-
 		A, B, C := Δx, -Δy, Δy*x1-Δx*y1
-		x := x1
+		f := func(x, y float64) float64 {
+			return A*y + B*x + C
+		}
+		d := f(x1+1/2, y1)
 		dirX := 1.0
-		if Δx < 0 {
+
+		if Δy < 0 {
 			dirX = -1
 		}
-		for y := y1; y < y2; y++ {
+		for x, y := x1, y1; y < y2; y++ {
 			screen.Set(int(x), int(y), c)
-			s := A*(y+1) + B*(x+0.5*dirX) + C
-			if dirX*s > 0 {
+			if d >= 0 { // NE
 				x += dirX
+				d += Δx - Δy
+			} else { // E
+				d += Δx
 			}
 		}
 	}
