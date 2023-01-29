@@ -25,61 +25,29 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
-
-		A := y2 - y1
-		B := -(x2 - x1)
-		C := (x2-x1)*y1 - (y2-y1)*x1
-
-		//  \ +
-		//   \
-		//  - \
-		//     \
-		if A >= 0 && B >= 0 {
+		dy := y2 - y1
+		dx := x2 - x1
+		d := 2*dy - dx
+		if y1 < y2 {
 			for x, y := x1, y1; x <= x2; x += 1 {
-				if A*(x+1)+B*(y-0.5)+C <= 0 {
-					img.Set(int(x)+1, int(y)-1, c)
-					y--
+				if d < 0 {
+					d += 2 * dy
+					img.Set(int(x), int(y), c)
 				} else {
-					img.Set(int(x)+1, int(y), c)
-				}
-			}
-		} else if A < 0 && B < 0 {
-			//  \ -
-			//   \
-			//  + \
-			//     \
-			for x, y := x1, y1; x <= x2; x += 1 {
-				if A*(x+1)+B*(y-0.5)+C <= 0 {
-					img.Set(int(x)+1, int(y), c)
-				} else {
-					img.Set(int(x)+1, int(y)-1, c)
-					y--
-				}
-			}
-		} else if A > 0 && B < 0 {
-			//   - /
-			//    /
-			//   / +
-			//  /
-			for x, y := x1, y1; x <= x2; x += 1 {
-				if A*(x+1)+B*(y+0.5)+C <= 0 {
-					img.Set(int(x)+1, int(y), c)
-				} else {
-					img.Set(int(x)+1, int(y)+1, c)
+					d += 2*dy - 2*dx
+					img.Set(int(x), int(y), c)
 					y++
 				}
 			}
-		} else if A < 0 && B > 0 {
-			//   + /
-			//    /
-			//   / -
-			//  /
+		} else {
 			for x, y := x1, y1; x <= x2; x += 1 {
-				if A*(x+1)+B*(y+0.5)+C <= 0 {
-					img.Set(int(x)+1, int(y)+1, c)
-					y++
+				if d < 0 {
+					d -= 2 * dy
+					img.Set(int(x), int(y), c)
 				} else {
-					img.Set(int(x)+1, int(y), c)
+					d += -2*dx - 2*dy
+					img.Set(int(x), int(y), c)
+					y--
 				}
 			}
 		}
@@ -88,24 +56,28 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 float64, c color.Color) {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
 		}
-		A := y2 - y1
-		B := -(x2 - x1)
-		C := (x2-x1)*y1 - (y2-y1)*x1
+		dy := y2 - y1
+		dx := x2 - x1
+		d := 2*dy - dx
 		if x1 < x2 {
 			for x, y := x1, y1; y <= y2; y += 1 {
-				if A*(x+0.5)+B*(y+1)+C <= 0 {
-					img.Set(int(x)+1, int(y)+1, c)
-					x++
+				if d < 0 {
+					d += 2 * dx
+					img.Set(int(x), int(y), c)
 				} else {
-					img.Set(int(x), int(y)+1, c)
+					d += 2*dx - 2*dy
+					img.Set(int(x), int(y), c)
+					x++
 				}
 			}
 		} else {
 			for x, y := x1, y1; y <= y2; y += 1 {
-				if A*(x-0.5)+B*(y+1)+C <= 0 {
-					img.Set(int(x), int(y)+1, c)
+				if d < 0 {
+					d -= 2 * dx
+					img.Set(int(x), int(y), c)
 				} else {
-					img.Set(int(x)-1, int(y)+1, c)
+					d += -2*dy - 2*dx
+					img.Set(int(x), int(y), c)
 					x--
 				}
 			}
