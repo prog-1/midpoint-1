@@ -44,9 +44,15 @@ func main() {
 	}
 }
 
+func abs(a int) int {
+	if a >= 0 {
+		return a
+	}
+	return -a
+}
 func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 	// abs(Dy) < abs(dx) | / abs(dx) => abs(Dy)/abs(Dx) < 1 == abs(k) < 1
-	if math.Abs(float64(y2-y1)) < math.Abs(float64(x2-x1)) {
+	if abs(y2-y1) < abs(x2-x1) {
 		if x1 > x2 {
 			x1, x2 = x2, x1
 			y1, y2 = y2, y1
