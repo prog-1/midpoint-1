@@ -71,16 +71,20 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		}
 		A := y2 - y1
 		B := -(x2 - x1)
-		C := -B*y1 - A*x1
+		// C := -B*y1 - A*x1  don't need C here
 		dirY := 1
 		if y2 < y1 { // dy < 0
 			dirY = -1
+			A = -A
 		}
+		d := A + B/2 // d0 which is the first midpoint (f(x1+1,y1+1/2))
 		for x, y := x1, y1; x <= x2; x++ {
 			img.Set(x, y, c)
-			f := 2*A*(x+1) + B*(2*y+1*dirY) + 2*C // multiply everything by 2 to get rid of 0.5 because we only care about the sign
-			if dirY*f > 0 {
+			if d > 0 {
 				y += dirY
+				d += A + B
+			} else {
+				d += A
 			}
 		}
 	} else {
@@ -89,16 +93,20 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		}
 		A := (x2 - x1)
 		B := -(y2 - y1)
-		C := -B*x1 - A*y1
+		// C := -B*x1 - A*y1  don't need C here
 		dirX := 1
 		if x2 < x1 { // dx < 0
 			dirX = -1
+			A = -A
 		}
+		d := A + B/2 // d0 which is the first midpoint (f(x1+1,y1+1/2))
 		for x, y := x1, y1; y <= y2; y++ {
 			img.Set(x, y, c)
-			f := 2*A*(y+1) + B*(2*x+1*dirX) + 2*C // multiply everything by 2 to get rid of 0.5 because we only care about the sign
-			if dirX*f > 0 {
+			if d > 0 {
 				x += dirX
+				d += A + B
+			} else {
+				d += A
 			}
 		}
 	}
