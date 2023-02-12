@@ -1,4 +1,4 @@
-module line
+module github.com/34thSchool/midpoint-1
 
 go 1.19
 
