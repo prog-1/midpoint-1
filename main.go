@@ -97,6 +97,6 @@ func DrawLine(img *ebiten.Image, x1, y1, x2, y2 int, c color.Color) {
 		}
 	}
 
-	img.Set(x1, y1, color.RGBA{1, 255, 1, 255})
-	img.Set(x2, y2, color.RGBA{1, 255, 1, 255})
+	// img.Set(x1, y1, color.RGBA{1, 255, 1, 255})
+	// img.Set(x2, y2, color.RGBA{1, 255, 1, 255})
 }
